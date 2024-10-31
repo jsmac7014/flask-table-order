@@ -18,7 +18,7 @@ def create_store(data):
     finally:
         conn.close()
 
-def get_store_categories(store_id):
+def get_stores_categories(store_id):
     conn = db_connect()
     if conn is None:
         return None
@@ -38,7 +38,7 @@ def get_store_categories(store_id):
     finally:
         conn.close()
 
-def get_store_menu(store_id):
+def get_stores_foods(store_id):
     conn = db_connect()
     if conn is None:
         return None
@@ -51,6 +51,23 @@ def get_store_menu(store_id):
         menu = [dict(zip(field, m)) for m in result]
 
         return menu
+    except Exception as e:
+        print('에러 발생', e)
+        return None
+    finally:
+        conn.close()
+
+def create_store_menu(data):
+    conn = db_connect()
+    if conn is None:
+        return None
+    try:
+        cursor = conn.cursor()
+        sql = 'INSERT INTO stores_foods (name, category, description, image_url, price, stores_id) VALUES (%s, %s, %s, %s, %s, %s)'
+        cursor.execute(sql, (data['name'], data['category'], data['description'], data['image_url'], data['price'], data['stores_id']))
+        conn.commit()
+        print('메뉴 생성 완료')
+        return True
     except Exception as e:
         print('에러 발생', e)
         return None

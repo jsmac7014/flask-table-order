@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, session, redirect
 
 from db.auth import sign_in_admin_user, sign_up_admin_user
-from db.stores import create_store, get_store_categories, get_store_menu
+from db.stores import create_store, get_stores_categories, get_stores_foods
 
 from s3_connect import connect
 
@@ -81,8 +81,8 @@ def upload():
 
 @admin.route('/menu')
 def menu():
-    categories = get_store_categories(session['stores_id'])
-    menus = get_store_menu(session['stores_id'])
+    categories = get_stores_categories(session['stores_id'])
+    menus = get_stores_foods(session['stores_id'])
 
     if not is_logged_in():
         return redirect('/admin/sign-in')
