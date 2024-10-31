@@ -1,11 +1,17 @@
+import os
+from numbers import Number
+
 from flask import session
 import pymysql
+from flask.cli import load_dotenv
 
-host = 'localhost'
-port = 3308
-user = 'root'
-password = ''
-database = 'table_order'
+load_dotenv()
+
+host = os.getenv("DATABASE_URL")
+port = int(os.getenv("DATABASE_PORT"))
+user = os.getenv("DATABASE_USER")
+password = os.getenv("DATABASE_PASSWORD")
+database = os.getenv("DATABASE_NAME")
 
 def db_connect():
     try:
