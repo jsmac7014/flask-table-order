@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, session, redirect
 
 from db.auth import sign_in_admin_user, sign_up_admin_user
-from db.stores import create_store, get_stores_categories, get_stores_foods
+from db.stores import create_store, get_stores_categories, get_stores_foods, create_store_foods
 
 from s3_connect import connect
 
@@ -88,6 +88,20 @@ def menu():
         return redirect('/admin/sign-in')
     return render_template('admin/menu.html', menus=menus, categories=categories)
 
+@admin.route('/menu/create', methods=['POST'])
+def menu_create():
+    if not is_logged_in():
+        return redirect('/admin/sign-in')
+    data = {
+        'name': request.form.get('name'),
+        'category': request.form.get('category'),
+        'description': request.form.get('description'),
+        'image_url': request.form.get('image_url'),
+        'price': request.form.get('price'),
+        'stores_id': session['stores_id']
+    }
+    create_store_foods(data)
+    return redirect('/admin/menu')
 
 @admin.route('/order')
 def order():

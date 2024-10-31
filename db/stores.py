@@ -57,7 +57,7 @@ def get_stores_foods(store_id):
     finally:
         conn.close()
 
-def create_store_menu(data):
+def create_store_foods(data):
     conn = db_connect()
     if conn is None:
         return None
