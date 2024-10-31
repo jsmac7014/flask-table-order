@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, request, session, redirect
+from flask import Blueprint, render_template, request, session, redirect, jsonify
+from werkzeug.utils import secure_filename
 
 from db.auth import sign_in_admin_user, sign_up_admin_user
-from db.stores import create_store, get_stores_categories, get_stores_foods, create_store_foods
+from db.stores import create_store, get_stores_categories, get_stores_foods, create_store_foods, get_stores_foods_detail
 
-from s3_connect import connect
+from s3_connect import connect, upload_file
 
 admin = Blueprint('admin', __name__)
 
@@ -65,19 +66,17 @@ def sign_out():
     return redirect('/admin/sign-in')
 
 
-@admin.route('/upload', methods=['POST'])
+@admin.route('/menu/upload', methods=['POST'])
 def upload():
     if not is_logged_in():
         return redirect('/admin/sign-in')
 
-    file = request.files['file']
-    s3 = connect()
-    s3.put_object(Bucket='table-order', Key=file.filename, Body=file)
-    # get url of the uploaded file
-    url = s3.generate_presigned_url('get_object', Params={'Bucket': 'table-order', 'Key': file.filename})
-    print(url)
-    # s3.upload_fileobj(file, 'table-order', file.filename)
-    return redirect('/admin')
+    file = request.files['image']
+    filename = secure_filename(file.filename)
+
+    url = upload_file(file, filename)
+    return url
+    # return redirect('/admin')
 
 @admin.route('/menu')
 def menu():
@@ -87,6 +86,14 @@ def menu():
     if not is_logged_in():
         return redirect('/admin/sign-in')
     return render_template('admin/menu.html', menus=menus, categories=categories)
+
+# menu detail route
+@admin.route('/menu/<menu_id>/edit', methods=['GET'])
+def menu_edit(menu_id):
+    if not is_logged_in():
+        return redirect('/admin/sign-in')
+    detail = get_stores_foods_detail(menu_id)
+    return render_template('admin/menu-edit.html', detail=detail, menu_id=menu_id)
 
 @admin.route('/menu/create', methods=['POST'])
 def menu_create():

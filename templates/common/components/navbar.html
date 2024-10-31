@@ -6,11 +6,11 @@
         <ul class="flex gap-2">
             <li>
                 <a href="{{ url_for('admin.menu') }}"
-                   class="rounded-full p-4 text-lg {{ "bg-zinc-800 text-white" if url_for(request.endpoint) == url_for('admin.menu') else "hover:bg-gray-100  hover:text-gray-500" }}">메뉴</a>
+                   class="rounded-full p-4 text-lg {{ "bg-zinc-800 text-white" if request.path == url_for('admin.menu') or request.path == url_for('admin.menu_edit', menu_id = menu_id) else "hover:bg-gray-100  hover:text-gray-500" }}">메뉴</a>
             </li>
             <li>
                 <a href="{{ url_for('admin.order') }}"
-                   class="rounded-full p-4 text-lg {{ "bg-zinc-800 text-white" if url_for(request.endpoint) == url_for('admin.order') else "hover:bg-gray-100  hover:text-gray-500" }}">주문</a>
+                   class="rounded-full p-4 text-lg {{ "bg-zinc-800 text-white" if request.path == url_for('admin.order') else "hover:bg-gray-100  hover:text-gray-500" }}">주문</a>
             </li>
             <li>
                 {#                <a class="rounded-full p-4 text-lg {{ "bg-zinc-800 text-white" if url_for(request.endpoint) == url_for('admin.menu') else "hover:bg-gray-100  hover:text-gray-500" }}"">테이블</a>#}

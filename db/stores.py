@@ -57,6 +57,25 @@ def get_stores_foods(store_id):
     finally:
         conn.close()
 
+def get_stores_foods_detail(menu_id):
+    conn = db_connect()
+    if conn is None:
+        return None
+    try:
+        cursor = conn.cursor()
+        sql = 'SELECT id, name, category, description, image_url, price FROM stores_foods WHERE id = %s'
+        cursor.execute(sql, (menu_id))
+        result = cursor.fetchone()
+        field = ['id', 'name', 'category', 'description', 'image_url', 'price']
+        menu = dict(zip(field, result))
+
+        return menu
+    except Exception as e:
+        print('에러 발생', e)
+        return None
+    finally:
+        conn.close()
+
 def create_store_foods(data):
     conn = db_connect()
     if conn is None:

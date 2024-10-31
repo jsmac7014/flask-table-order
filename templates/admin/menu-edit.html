@@ -1,0 +1,15 @@
+{% extends 'common/layouts/main_layout.html' %}
+{% block content %}
+    <div class="p-2 max-w-5xl mx-auto w-full">
+        <form class="flex flex-row  justify-center gap-2 w-full">
+            <img class="min-w-96 min-h-96 object-contain rounded-md"  src="{{ detail.image_url }}">
+            <div class="flex flex-col gap-1 max-w-96 w-full">
+                <input class="w-full p-2 rounded border text-lg" placeholder="음식 이름" value="{{ detail.name }}">
+                <input class="w-full p-2 rounded border text-lg" placeholder="가격" value="{{ detail.price }}">
+                <textarea class="w-full p-2 rounded border text-lg" placeholder="설명">{{ detail.description }}</textarea>
+                <button class="p-2 rounded-md bg-zinc-800 text-white">저장</button>
+                <button class="p-2 rounded-md bg-white text-red-500">삭제</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
