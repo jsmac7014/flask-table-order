@@ -1,0 +1,83 @@
+{% extends 'common/layouts/main_layout.html' %}
+{% block content %}
+    <div class="flex flex-col w-full p-2 max-w-6xl mx-auto">
+        <div class="flex flex-col gap-2">
+            <div class="">
+                <h2 class="text-2xl font-bold text-gray-800">카테고리</h2>
+                <ul class="flex flex-row gap-2">
+                    {% for category in categories %}
+                        <li class="rounded-full bg-white border px-4 py-2">
+                            <a href="/admin/category/{{ category.id }}">{{ category.name }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="">
+                <div class="flex justify-between">
+                    <h2 class="text-2xl font-bold text-gray-800">메뉴</h2>
+                    <button id="open-modal">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                             stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                        </svg>
+                    </button>
+                </div>
+                <ul class="flex flex-row gap-2">
+                    {% for menu in menus %}
+                        <li class="bg-white rounded-md p-3 hover:bg-gray-200 transition-colors">
+                            <a href="/admin/product/{{ menu.id }}">{{ menu.name }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    {#  modal  #}
+    <div class="hidden" id="modal">
+        <div class="absolute top-0 left-0 z-10 bg-gray-900 opacity-50 w-full h-full">
+        </div>
+        <div class="bg-white rounded-md p-4 z-20 relative top-0 left-0 max-w-3xl mx-auto">
+            <div class="flex justify-between items-center mb-2">
+                <h1 class="text-2xl font-bold text-gray-800">메뉴 추가</h1>
+                <button class="" id="close-modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <form class="flex flex-col gap-2">
+                <label for="image" class="w-full border rounded-md p-4 flex justify-center items-center gap-2">
+                    <span>이미지 업로드</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"/>
+                    </svg>
+                </label>
+                <input type="file" id="image" class="hidden">
+
+                <input type="text" placeholder="메뉴 이름" class="w-full p-2 border rounded-md">
+                <input type="text" placeholder="가격" class="w-full p-2 border rounded-md">
+                <textarea placeholder="설명" class="w-full p-2 border rounded-md" ></textarea>
+                <button class="bg-zinc-800 text-white p-2 rounded-md">추가</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        {#    modal code    #}
+        const openModalBtn = document.querySelector('#open-modal');
+        const closeModalBtn = document.querySelector('#close-modal');
+
+        const modal = document.querySelector('#modal');
+
+        openModalBtn.addEventListener('click', () => {
+            modal.classList.toggle('hidden');
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            modal.classList.toggle('hidden');
+        });
+    </script>
+{% endblock %}
