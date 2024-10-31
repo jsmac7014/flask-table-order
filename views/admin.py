@@ -61,7 +61,7 @@ def sign_up():
 @admin.route('/sign-out')
 def sign_out():
     session.clear()
-    return redirect('/')
+    return redirect('/admin/sign-in')
 
 
 
