@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 
 from db.auth import sign_in_admin_user, sign_up_admin_user
 from db.stores import create_store, get_stores_categories, get_stores_foods, create_store_foods, get_stores_foods_detail
+from db.stores_tables import get_stores_tables
 
 from s3_connect import connect, upload_file
 
@@ -12,10 +13,11 @@ def is_logged_in():
     return session.get('logged_in')
 
 @admin.route('/')
-def dashboard():
+def table():
+    tables = get_stores_tables(session['stores_id'])
     if not is_logged_in():
         return redirect('/admin/sign-in')
-    return render_template('admin/dashboard.html')
+    return render_template('admin/table/table.html', tables=tables)
 
 @admin.route('/sign-in', methods=['GET', 'POST'])
 def sign_in():
@@ -85,7 +87,7 @@ def menu():
 
     if not is_logged_in():
         return redirect('/admin/sign-in')
-    return render_template('admin/menu.html', menus=menus, categories=categories)
+    return render_template('admin/menu/menu.html', menus=menus, categories=categories)
 
 # menu detail route
 @admin.route('/menu/<menu_id>/edit', methods=['GET'])
@@ -93,7 +95,7 @@ def menu_edit(menu_id):
     if not is_logged_in():
         return redirect('/admin/sign-in')
     detail = get_stores_foods_detail(menu_id)
-    return render_template('admin/menu-edit.html', detail=detail, menu_id=menu_id)
+    return render_template('admin/menu/menu-edit.html', detail=detail, menu_id=menu_id)
 
 @admin.route('/menu/create', methods=['POST'])
 def menu_create():
@@ -114,4 +116,4 @@ def menu_create():
 def order():
     if not is_logged_in():
         return redirect('/admin/sign-in')
-    return render_template('admin/order.html')
+    return render_template('admin/order/order.html')
