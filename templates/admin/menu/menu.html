@@ -1,12 +1,12 @@
 {% extends 'common/layouts/main_layout.html' %}
 {% block content %}
-    <div class="flex flex-col w-full p-2 max-w-6xl mx-auto">
+    <div class="mx-auto flex w-full max-w-6xl flex-col p-2">
         <div class="flex flex-col gap-2">
             <div class="">
                 <h2 class="text-2xl font-bold text-gray-800">카테고리</h2>
                 <ul class="flex flex-row gap-2">
                     {% for category in categories %}
-                        <li class="rounded-full bg-white border px-4 py-2">
+                        <li class="rounded-full border bg-white px-4 py-2">
                             <a href="/admin/category/{{ category.id }}">{{ category.name }}</a>
                         </li>
                     {% endfor %}
@@ -22,11 +22,11 @@
                         </svg>
                     </button>
                 </div>
-                <ul class="grid grid-cols-2 gap-2 md:grid-cols-5 cursor-pointer">
+                <ul class="grid cursor-pointer grid-cols-2 gap-2 md:grid-cols-5">
                     {% for menu in menus %}
-                        <li class="bg-white rounded-md p-3 hover:bg-gray-200 transition-colors">
+                        <li class="rounded-md bg-white p-3 transition-colors hover:bg-gray-200">
                             <a href="{{ url_for('admin.menu_edit', menu_id = menu.id ) }}">
-                                <img src="{{ menu.image_url }}" alt="" class="w-full h-48 object-cover rounded-md">
+                                <img src="{{ menu.image_url }}" alt="" class="h-48 w-full rounded-md object-cover">
                                 <h1 class="text-lg font-bold">{{ menu.name }}</h1>
                                 <p class="text-gray-500">{{ menu.description }}</p>
                                 <p class="text-gray-800">{{ menu.price }}</p>
@@ -40,9 +40,9 @@
 
     {#  modal  #}
     <div class="hidden" id="modal">
-        <div class="fixed top-0 left-0 z-10 bg-gray-900 opacity-50 w-full h-full"></div>
-        <div class="bg-white rounded-md p-4 z-20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  max-w-3xl mx-auto w-full">
-            <div class="flex justify-between items-center mb-2">
+        <div class="fixed top-0 left-0 z-10 h-full w-full bg-gray-900 opacity-50"></div>
+        <div class="absolute top-1/2 left-1/2 z-20 mx-auto w-full max-w-3xl -translate-x-1/2 -translate-y-1/2 rounded-md bg-white p-4">
+            <div class="mb-2 flex items-center justify-between">
                 <h1 class="text-2xl font-bold text-gray-800">메뉴 추가</h1>
                 <button class="" id="close-modal">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -53,8 +53,8 @@
             </div>
 
             <form class="flex flex-col gap-2" method="post" action="/admin/menu/create">
-                <img src="" alt="" class="w-full h-48 object-cover rounded-md hidden" id="preview">
-                <label for="image" class="group w-full border rounded-md p-4 flex justify-center items-center gap-2"
+                <img src="" alt="" class="hidden h-48 w-full rounded-md object-cover" id="preview">
+                <label for="image" class="flex w-full items-center justify-center gap-2 rounded-md border p-4 group"
                        id="image-label">
                     <span>이미지 업로드</span>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
@@ -64,13 +64,13 @@
                     </svg>
                     <input type="file" id="image" class="hidden" name="file" accept="image/*">
                 </label>
-                <button type="button" class="bg-gray-100 p-2 rounded-md hidden" id="image-cancel">취소</button>
+                <button type="button" class="hidden rounded-md bg-gray-100 p-2" id="image-cancel">취소</button>
                 <input class="hidden" type="text" name="image_url" id="image_url">
-                <input type="text" placeholder="메뉴 이름" class="w-full p-2 border rounded-md" name="name">
-                <input type="text" placeholder="카테고리" class="w-full p-2 border rounded-md" name="category">
-                <input type="text" placeholder="가격" class="w-full p-2 border rounded-md" name="price">
-                <textarea placeholder="설명" class="w-full p-2 border rounded-md" name="description"></textarea>
-                <button class="bg-zinc-800 text-white p-2 rounded-md" type="submit">추가</button>
+                <input type="text" placeholder="메뉴 이름" class="w-full rounded-md border p-2" name="name">
+                <input type="text" placeholder="카테고리" class="w-full rounded-md border p-2" name="category">
+                <input type="text" placeholder="가격" class="w-full rounded-md border p-2" name="price">
+                <textarea placeholder="설명" class="w-full rounded-md border p-2" name="description"></textarea>
+                <button class="rounded-md bg-zinc-800 p-2 text-white" type="submit">추가</button>
             </form>
         </div>
     </div>
