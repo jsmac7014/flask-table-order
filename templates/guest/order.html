@@ -4,31 +4,48 @@
 {% endblock %}
 
 {% block body %}
-    <div class="w-full min-h-screen bg-zinc-900 p-2">
+    <div class="min-h-screen w-full bg-zinc-900 p-2">
         {#  navbar   #}
         <div class="flex w-full p-4">
             {#     current table number       #}
-            <h1 class="text-xl font-bold text-gray-400">Table 1</h1>
+            <div class="flex items-center gap-2">
+                <select name="table" class="rounded-md bg-zinc-800 px-4 py-2 text-white text-md" disabled>
+                    {% for table in tables %}
+                        <option value="{{ table.id }}">{{ table.name }}</option>
+                    {% endfor %}
+                </select>
+                <button class="rounded-md text-white bg-zinc-800 px-4 py-2 inline-flex gap-2 text-md items-center"
+                        onclick="changeTableSelectState()">
+                    <span>
+                        테이블 변경
+                    </span>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                         stroke="currentColor" class="size-5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                              d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10"/>
+                    </svg>
+                </button>
+            </div>
         </div>
-        <div class="w-full h-full">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+        <div class="h-full w-full">
+            <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
                 {% for m in menu %}
-                    <div class="menu p-4 bg-zinc-800 rounded-md shadow-md flex justify-start gap-4"
+                    <div class="flex justify-start gap-4 rounded-md bg-zinc-800 p-4 shadow-md menu"
                          id="food-{{ m.id }}">
-                        <img src="{{ m.image_url }}" alt="" class="w-48 h-48 object-cover rounded-md">
-                        <div class="flex gap-4 flex-col">
+                        <img src="{{ m.image_url }}" alt="{{ m.name }}" class="h-48 w-48 rounded-md object-cover" id="food-image-{{ m.id }}">
+                        <div class="flex flex-col gap-4">
                             <div>
-                                <h1 class="text-white text-xl font-bold">{{ m.name }}</h1>
+                                <h1 class="text-xl font-bold text-white" id="food-name-{{ m.id }}">{{ m.name }}</h1>
                                 <p class="text-gray-300">{{ m.description }}</p>
-                                <p class="text-white font-bold">{{ m.price }}</p>
+                                <p class="font-bold text-white" id="food-price-{{ m.id }}">{{ m.price }}</p>
                             </div>
                             {#            qty counter               #}
-                            <div class="flex gap-2 items-center">
-                                <button class="bg-zinc-700 text-white rounded-full p-2 hover:bg-gray-100 hover:text-gray-500 shadow transition-colors w-12 h-12 text-xl"
+                            <div class="flex items-center gap-2">
+                                <button class="h-12 w-12 rounded-full bg-zinc-700 p-2 text-xl text-white shadow transition-colors hover:bg-gray-100 hover:text-gray-500"
                                         onclick="changeQty('minus', {{ m.id }})">-
                                 </button>
                                 <span class="text-white" id="food-qty-{{ m.id }}">0</span>
-                                <button class="bg-zinc-700 text-white rounded-full p-2 hover:bg-gray-100 hover:text-gray-500 shadow transition-colors w-12 h-12 text-xl"
+                                <button class="h-12 w-12 rounded-full bg-zinc-700 p-2 text-xl text-white shadow transition-colors hover:bg-gray-100 hover:text-gray-500"
                                         onclick="changeQty('plus', {{ m.id }})">+
                                 </button>
                             </div>
@@ -36,49 +53,10 @@
                     </div>
                 {% endfor %}
             </div>
-            <div class="hidden">
-                <div class="fixed top-0 left-0 w-full h-full opacity-20 bg-white z-10"></div>
-                <div class="rounded-md p-4 z-20 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2  max-w-3xl mx-auto w-full">
-                    <div class="bg-zinc-800 p-4 rounded-md shadow-md max-w-3xl mx-auto">
-                        <h1 class="text-white text-2xl font-bold">선택 내역</h1>
-                        <ul class="flex flex-col gap-2">
-                            <li class="flex justify-between items-center">
-                                <span class="text-white text-lg">아메리카노</span>
-                                <span class="text-white text-lg">2</span>
-                            </li>
-                                                        <li class="flex justify-between items-center">
-                                <span class="text-white text-lg">아메리카노</span>
-                                <span class="text-white text-lg">2</span>
-                            </li>
-                                                        <li class="flex justify-between items-center">
-                                <span class="text-white text-lg">아메리카노</span>
-                                <span class="text-white text-lg">2</span>
-                            </li>
-                                                        <li class="flex justify-between items-center">
-                                <span class="text-white text-lg">아메리카노</span>
-                                <span class="text-white text-lg">2</span>
-                            </li>
-                                                        <li class="flex justify-between items-center">
-                                <span class="text-white text-lg">아메리카노</span>
-                                <span class="text-white text-lg">2</span>
-                            </li>
-                                                        <li class="flex justify-between items-center">
-                                <span class="text-white text-lg">아메리카노</span>
-                                <span class="text-white text-lg">2</span>
-                            </li>
-                                                        <li class="flex justify-between items-center">
-                                <span class="text-white text-lg">아메리카노</span>
-                                <span class="text-white text-lg">2</span>
-                            </li>
-
-                        </ul>
-                    </div>
-                </div>
-            </div>
         </div>
-
-        <div class="fixed bottom-10 right-5">
-            <a class="bg-zinc-700 text-white rounded-full p-4 hover:bg-gray-100 hover:text-gray-500 shadow transition-colors flex gap-2 items-center justify-center cursor-pointer">
+        <div class="fixed right-5 bottom-10">
+            <button class="flex cursor-pointer items-center justify-center gap-2 rounded-full bg-zinc-700 p-4 text-white shadow transition-colors hover:bg-gray-100 hover:text-gray-500"
+                    onclick="setOrderItems()">
                 <span>
                     주문하기
                 </span>
@@ -87,11 +65,23 @@
                     <path stroke-linecap="round" stroke-linejoin="round"
                           d="m12.75 15 3-3m0 0-3-3m3 3h-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                 </svg>
-            </a>
+            </button>
         </div>
     </div>
 
     <script>
+        {#   get localStorage on startup     #}
+        window.onload = function () {
+            const table_id = getTableIdFromLocalStorage()
+            console.log(table_id)
+            if (table_id) {
+                const tableSelect = document.querySelector('select[name="table"]')
+                tableSelect.value = table_id
+            }
+
+            document.querySelector('select[name="table"]').addEventListener('change', changeTable)
+        }
+
         function changeQty(operator, menu_id) {
             const qty = document.getElementById(`food-qty-${menu_id}`)
 
@@ -108,23 +98,87 @@
             }
         }
 
-        function getOrder() {
+        function _getOrder() {
             const order = []
             const menus = document.querySelectorAll('.menu')
 
             menus.forEach(menu => {
                 const id = menu.id.split('-')[1]
                 const qty = document.getElementById(`food-qty-${id}`).innerText
+                const imageUrl = document.getElementById(`food-image-${id}`).src
+                const name = document.getElementById(`food-name-${id}`).textContent
+                const price = document.getElementById(`food-price-${id}`).innerText
+
+
 
                 if (parseInt(qty) > 0) {
                     order.push({
-                        id: id,
-                        qty: qty
+                        stores_foods_id: id,
+                        quantity: qty,
+                        imageUrl: imageUrl,
+                        name: name,
+                        price: price
                     })
                 }
             })
 
-            console.log(order)
+            return order
+        }
+
+        function _getOrderFromLocalStorage() {
+            return JSON.parse(localStorage.getItem('order'))
+        }
+
+        function setOrderItems() {
+            const order = _getOrder()
+
+            if (order.length === 0) {
+                alert('주문할 메뉴를 선택해주세요')
+                return
+            }
+
+            localStorage.setItem('order', JSON.stringify(order))
+            window.location.href = '/guest/order-confirm/{{ stores_id }}'
+        }
+
+        function changeTable(event) {
+            const table_id = event.target.value
+            localStorage.setItem('table_id', table_id)
+            window.location.reload()
+        }
+
+        function changeTableSelectState() {
+            let username = prompt('사용자 이름을 입력해주세요')
+            let password = prompt('비밀번호를 입력해주세요')
+            let stores_id = {{ stores_id }}
+
+
+            fetch('/admin/check/auth', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                    stores_id: stores_id
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    console.log(data)
+                    if (data.status === 'success') {
+                        {#enableTableSelect()#}
+                        const tableSelect = document.querySelector('select[name="table"]')
+                        tableSelect.removeAttribute('disabled')
+                    } else {
+                        alert('인증에 실패하였습니다')
+                    }
+                })
+        }
+
+        function getTableIdFromLocalStorage() {
+            return localStorage.getItem('table_id')
         }
     </script>
 {% endblock %}

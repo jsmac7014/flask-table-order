@@ -62,3 +62,19 @@ def get_admin_user(username):
         return None
     finally:
         conn.close()
+
+def check_admin_user_with_stores_id(data):
+    conn = db_connect()
+    if conn is None:
+        return None
+    try:
+        cursor = conn.cursor()
+        sql = 'SELECT s.id FROM users u, stores s WHERE u.id = s.users_id AND u.username = %s AND u.password = %s AND s.id = %s'
+        cursor.execute(sql, (data['username'], data['password'], data['stores_id']))
+        result = cursor.fetchall()
+        return result
+    except Exception as e:
+        print('에러 발생', e)
+        return None
+    finally:
+        conn.close()

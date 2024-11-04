@@ -2,7 +2,18 @@
 {% block title %}Dashboard{% endblock %}
 {% block content %}
     <div class="p-2">
-        <h1 class="mb-2 text-3xl font-bold text-gray-600">등록된 테이블</h1>
+        <div class="flex items-center justify-between mb-2">
+            <h1 class="text-3xl font-bold text-gray-600">등록된 테이블</h1>
+            <button id="open-modal"
+                    class="flex items-center gap-1 rounded-full bg-gray-500 px-3 py-2 text-gray-200 hover:text-gray-400">
+                <span class="">테이블 추가하기</span>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                </svg>
+            </button>
+        </div>
         {#   list of tables    #}
         {% if not tables %}
             <div class="flex items-center justify-between gap-1 rounded-md bg-gray-300 p-3">
@@ -14,34 +25,33 @@
                     </svg>
                     <span class="font-bold">등록된 테이블이 없습니다</span>
                 </div>
-
-                <button id="open-modal"
-                        class="flex items-center gap-1 rounded-full bg-gray-500 px-3 py-2 text-gray-200 hover:text-gray-400">
-                    <span class="">테이블 추가하기</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                         stroke="currentColor" class="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-                    </svg>
-                </button>
             </div>
 
         {% else %}
-            <ul class="grid grid-cols-1 gap-2 md:grid-cols-3">
+            <ul class="grid grid-cols-1 gap-2 md:grid-cols-5">
                 {% for table in tables %}
-                    <li class="rounded-md bg-white p-4 transition-colors hover:bg-gray-200">
-                        <a href="{{ url_for('admin.table', table_id = table.id) }}">
+                    <li class="rounded-md bg-white p-4 transition-colors hover:bg-gray-200 text-center">
+                        <a href="{{ url_for('admin.table_detail', table_id = table.id) }}">
                             <h1 class="text-lg font-bold">{{ table.name }}</h1>
-                            <p class="text-gray-500">{{ table.description }}</p>
+                            <p class="text-gray-500">{{ table.min_seat }} ~ {{ table.max_seat }}명</p>
                         </a>
                     </li>
                 {% endfor %}
             </ul>
         {% endif %}
 
-        {#  modal  #}
         {% from "common/components/modal.html" import modal %}
-        {{ modal('테이블 추가', '', '#open-modal') }}
+        {% call modal('테이블 추가', '#open-modal') %}
+                <form class="flex flex-col gap-1" method="post" action="/admin/table/create">
+                    <input class="p-2 border rounded-md w-full" type="text" placeholder="테이블 이름" name="name" />
+                    <div class="flex gap-1">
+                        <input class="p-2 border rounded-md w-full" type="number" placeholder="최소 자리" name="min_seat" />
+                        <input class="p-2 border rounded-md w-full" type="number" placeholder="최대 자리"  name="max_seat" />
+                    </div>
+                    <button type="submit" class="rounded-md bg-zinc-800 text-gray-200 p-2 hover:bg-zinc-700">추가하기</button>
+                </form>
+        {% endcall %}
+
 
     </div>
 {% endblock %}

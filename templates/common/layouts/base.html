@@ -1,10 +1,25 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* add the code bellow */
+        @layer utilities {
+            /* Hide scrollbar for Chrome, Safari and Opera */
+            .no-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+
+            /* Hide scrollbar for IE, Edge and Firefox */
+            .no-scrollbar {
+                -ms-overflow-style: none; /* IE and Edge */
+                scrollbar-width: none; /* Firefox */
+            }
+        }
+    </style>
     {% block head %} {% endblock %}
-  </head>
-  <body>
-    {% block body %} {% endblock %}
-  </body>
+</head>
+<body class="overflow-y-hidden">
+{% block body %} {% endblock %}
+</body>
 </html>
