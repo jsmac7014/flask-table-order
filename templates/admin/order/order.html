@@ -1,1 +1,44 @@
 {% extends 'common/layouts/main_layout.html' %}
+
+
+{% block content %}
+    <div class="p-2 ">
+        <h1 class="text-3xl font-bold text-gray-600 mb-2">주문 리스트</h1>
+        <div class="flex">
+            <ul id="orderList" class="flex flex-col gap-2 flex-1 overflow-y-scroll max-h-screen">
+                {% for order in orders %}
+                    <li class="px-4 py-3 bg-white rounded-md flex justify-between cursor-pointer"
+                        data-order-id="{{ order.orders_id }}">
+                        <span class="font-bold">
+                            {{ order.table_name }}
+                        </span>
+                        <span class="font-bold {{ "text-yellow-500" if order.status == "PENDING" else "text-green-500" }}">
+                             {{ order.status }}
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+            <div class="flex-1">
+                {#    order details        #}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const eventSource = new EventSource('/order/stream/{{ session['stores_id'] }}');
+        eventSource.onmessage = function (event) {
+            const data = JSON.parse(event.data);
+            console.log(data);
+
+            const orderList = document.getElementById('orderList');
+            const orderItem = document.createElement('li');
+            orderItem.textContent = `Order ID: ${orderData.id}, Quantity: ${orderData.quantity}`;
+            orderList.appendChild(orderItem);
+        }
+
+        eventSource.onerror = function (error) {
+            console.error('Error with SSE connection:', error);
+            // You could reconnect or show an error message to the user here
+        };
+    </script>
+{% endblock %}
