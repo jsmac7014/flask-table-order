@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, session, redirect, jsonif
 from werkzeug.utils import secure_filename
 
 from db.auth import sign_in_admin_user, sign_up_admin_user, check_admin_user_with_stores_id
-from db.orders import get_last_orders_id, get_new_orders, get_orders_list
+from db.orders import get_last_orders_id, get_new_orders, get_orders_list, get_orders_detail
 from db.stores import create_store, get_stores_categories, get_stores_foods, create_store_foods, get_stores_foods_detail
 from db.stores_tables import get_stores_tables, create_stores_tables, get_stores_tables_detail
 
@@ -102,12 +102,11 @@ def upload():
 
 @admin.route('/menu')
 def menu():
-    categories = get_stores_categories(session['stores_id'])
     menus = get_stores_foods(session['stores_id'])
 
     if not is_logged_in():
         return redirect('/admin/sign-in')
-    return render_template('admin/menu/menu.html', menus=menus, categories=categories)
+    return render_template('admin/menu/menu.html', menus=menus)
 
 
 # menu detail route
@@ -144,6 +143,18 @@ def order():
 
     return render_template('admin/order/order.html', orders=orders_list)
 
+@admin.route('/order/detail/<order_id>', methods=['POST'])
+def order_detail(order_id):
+    if not is_logged_in():
+        return redirect('/admin/sign-in')
+
+    data = request.get_json()
+
+    orders_id = data['orders_id']
+    stores_id = session['stores_id']
+
+    orders = get_orders_detail(orders_id, stores_id)
+    return jsonify(orders)
 
 
 @admin.route('/table/create', methods=['POST'])

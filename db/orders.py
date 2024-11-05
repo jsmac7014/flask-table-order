@@ -18,6 +18,7 @@ def create_order(data):
         conn.rollback()
         return None
     finally:
+        cursor.close()
         conn.close()
 
 def create_orders_has_foods(orders, orders_id):
@@ -39,6 +40,7 @@ def create_orders_has_foods(orders, orders_id):
         conn.rollback()
         return False
     finally:
+        cursor.close()
         conn.close()
 
 def get_last_orders_id(stores_id):
@@ -61,6 +63,7 @@ def get_last_orders_id(stores_id):
         print('에러 발생', e)
         return None
     finally:
+        cursor.close()
         conn.close()
 
 def get_new_orders(stores_id, last_orders_id):
@@ -72,19 +75,21 @@ def get_new_orders(stores_id, last_orders_id):
     try:
         cursor = conn.cursor()
         sql = """
-                SELECT o.id FROM orders o, stores_tables t
-                WHERE o.stores_tables_id = t.id AND t.stores_id = %s AND o.id > %s 
-                ORDER BY o.id ASC
+                    SELECT orders_id, t.id, t.name, status, o.order_date FROM orders_has_foods ohf, orders o, stores_tables t
+            WHERE ohf.orders_id = o.id AND o.stores_tables_id = t.id AND t.stores_id = %s AND o.id > %s 
+            GROUP BY orders_id
+            ORDER BY orders_id ASC
         """
         cursor.execute(sql, (stores_id, last_orders_id))
         result = cursor.fetchall()
-        field = ['id']
+        field = ['orders_id', 'stores_tables_id', 'table_name', 'status', 'order_date']
         result = [dict(zip(field, r)) for r in result]
         return result
     except Exception as e:
         print('에러 발생', e)
         return None
     finally:
+        cursor.close()
         conn.close()
 
 def get_orders_list(store_id):
@@ -99,6 +104,7 @@ def get_orders_list(store_id):
             SELECT orders_id, t.id, t.name, status, o.order_date FROM orders_has_foods ohf, orders o, stores_tables t
             WHERE ohf.orders_id = o.id AND o.stores_tables_id = t.id AND t.stores_id = %s
             GROUP BY orders_id
+            ORDER BY orders_id DESC
         """
 
         cursor.execute(sql, (store_id))
@@ -111,4 +117,31 @@ def get_orders_list(store_id):
         print('에러 발생', e)
         return None
     finally:
+        cursor.close()
         conn.close()
+
+def get_orders_detail(orders_id, stores_id):
+    conn = db_connect()
+
+    if conn is None:
+        return None
+
+    try:
+        cursor = conn.cursor()
+        sql = """
+            SELECT f.name, ohf.quantity, f.price FROM orders_has_foods ohf, stores_foods f
+            WHERE ohf.stores_foods_id = f.id AND ohf.orders_id = %s AND f.stores_id = %s
+        """
+
+        cursor.execute(sql, (orders_id, stores_id))
+        result = cursor.fetchall()
+        field = ['name', 'quantity', 'price']
+        orders = [dict(zip(field, r)) for r in result]
+
+        return orders
+    except Exception as e:
+        print('에러 발생', e)
+        return None
+    finally:
+        cursor.close()
+        conn.close

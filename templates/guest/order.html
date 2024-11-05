@@ -6,7 +6,7 @@
 {% block body %}
     <div class="min-h-screen w-full bg-zinc-900 p-2">
         {#  navbar   #}
-        <div class="flex w-full p-4">
+        <div class="flex w-full px-4 py-2 flex-col gap-2">
             {#     current table number       #}
             <div class="flex items-center gap-2">
                 <select name="table" class="rounded-md bg-zinc-800 px-4 py-2 text-white text-md" disabled>
@@ -26,13 +26,26 @@
                     </svg>
                 </button>
             </div>
+            <div class="flex gap-2">
+                <button class="rounded-md bg-zinc-800 min-w-48 py-3 text-white hover:bg-zinc-700 transition-colors"
+                        onclick="showFoodsByCategory('ALL')">전체
+                </button>
+                {% for category in categories %}
+                    <button class="rounded-md bg-zinc-800 min-w-48 py-3 text-white hover:bg-zinc-700 transition-colors"
+                            onClick="showFoodsByCategory('{{ category.name }}')">{{ category.name }}</button>
+                {% endfor %}
+            </div>
         </div>
-        <div class="h-full w-full">
+        {#  category   #}
+
+        <div class="h-full w-full px-4">
             <div class="grid grid-cols-1 gap-2 md:grid-cols-3">
                 {% for m in menu %}
                     <div class="flex justify-start gap-4 rounded-md bg-zinc-800 p-4 shadow-md menu"
+                         data-category="{{ m.category }}"
                          id="food-{{ m.id }}">
-                        <img src="{{ m.image_url }}" alt="{{ m.name }}" class="h-48 w-48 rounded-md object-cover" id="food-image-{{ m.id }}">
+                        <img src="{{ m.image_url }}" alt="{{ m.name }}" class="h-48 w-48 rounded-md object-cover"
+                             id="food-image-{{ m.id }}">
                         <div class="flex flex-col gap-4">
                             <div>
                                 <h1 class="text-xl font-bold text-white" id="food-name-{{ m.id }}">{{ m.name }}</h1>
@@ -110,7 +123,6 @@
                 const price = document.getElementById(`food-price-${id}`).innerText
 
 
-
                 if (parseInt(qty) > 0) {
                     order.push({
                         stores_foods_id: id,
@@ -179,6 +191,19 @@
 
         function getTableIdFromLocalStorage() {
             return localStorage.getItem('table_id')
+        }
+
+        function showFoodsByCategory(name) {
+            const menus = document.querySelectorAll('.menu')
+            menus.forEach(menu => {
+                if (menu.getAttribute('data-category') === name) {
+                    menu.style.display = 'flex'
+                } else if (name === 'ALL') {
+                    menu.style.display = 'flex'
+                } else {
+                    menu.style.display = 'none'
+                }
+            })
         }
     </script>
 {% endblock %}

@@ -2,43 +2,117 @@
 
 
 {% block content %}
-    <div class="p-2 ">
-        <h1 class="text-3xl font-bold text-gray-600 mb-2">주문 리스트</h1>
-        <div class="flex">
+    <div class="p-2">
+        <div class="inline-flex w-1/2 justify-between mb-2">
+            <h1 class="text-3xl font-bold text-gray-600">주문 리스트</h1>
+            <button class="bg-white rounded-md p-2 border">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                     stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"/>
+                </svg>
+            </button>
+        </div>
+        <div class="flex gap-2">
             <ul id="orderList" class="flex flex-col gap-2 flex-1 overflow-y-scroll max-h-screen">
                 {% for order in orders %}
-                    <li class="px-4 py-3 bg-white rounded-md flex justify-between cursor-pointer"
-                        data-order-id="{{ order.orders_id }}">
+                    <li>
+                        <input type="radio" name="order" value="{{ order.orders_id }}"
+                               class="peer hidden" id="orders-{{ order.orders_id }}">
+                        <label for="orders-{{ order.orders_id }}"
+                               class="px-4 py-3 bg-white rounded-md flex justify-between cursor-pointer border peer-checked:bg-gray-200"
+                               data-order-id="{{ order.orders_id }}"
+                               onclick="showOrderDetail({{ order.orders_id }})"
+                        >
                         <span class="font-bold">
                             {{ order.table_name }}
+                            <br/>
+                            {{ order.order_date }}
                         </span>
-                        <span class="font-bold {{ "text-yellow-500" if order.status == "PENDING" else "text-green-500" }}">
+                            <span class="font-bold {{ "text-yellow-500" if order.status == "PENDING" else "text-green-500" }}">
                              {{ order.status }}
                         </span>
+                        </label>
                     </li>
                 {% endfor %}
             </ul>
-            <div class="flex-1">
+            <div class="flex-1" id="order-detail">
                 {#    order details        #}
             </div>
         </div>
     </div>
 
     <script>
-        const eventSource = new EventSource('/order/stream/{{ session['stores_id'] }}');
-        eventSource.onmessage = function (event) {
-            const data = JSON.parse(event.data);
-            console.log(data);
-
-            const orderList = document.getElementById('orderList');
-            const orderItem = document.createElement('li');
-            orderItem.textContent = `Order ID: ${orderData.id}, Quantity: ${orderData.quantity}`;
-            orderList.appendChild(orderItem);
+        window.onload = function () {
+            const body = document.querySelector('body');
+            body.classList.add('overflow-y-hidden');
         }
+        {#const eventSource = new EventSource('/order/stream/{{ session['stores_id'] }}');#}
+        {#eventSource.onmessage = function (event) {#}
+        {#    let data = JSON.parse(event.data);#}
+        {#    console.log(data);#}
+        {#    data = data[0];#}
+        {##}
+        {#    const orderList = document.getElementById('orderList');#}
+        {#    const orderItem = document.createElement('li');#}
+        {##}
+        {#    orderItem.classList.add('px-4', 'py-3', 'bg-white', 'rounded-md', 'flex', 'justify-between', 'cursor-pointer');#}
+        {#    orderItem.setAttribute('data-order-id', data.orders_id);#}
+        {##}
+        {#    const orderInfo = document.createElement('span');#}
+        {#    orderInfo.classList.add('font-bold');#}
+        {#    orderInfo.innerText = `${data.table_name}\n${data.order_date}`;#}
+        {#    orderItem.appendChild(orderInfo);#}
+        {##}
+        {#    const orderStatus = document.createElement('span');#}
+        {#    orderStatus.classList.add('font-bold', `${data.status === 'PENDING' ? 'text-yellow-500' : 'text-green-500'}`);#}
+        {#    orderStatus.innerText = data.status;#}
+        {#    orderItem.appendChild(orderStatus);#}
+        {##}
+        {##}
+        {#    orderList.prepend(orderItem);#}
+        {##}
+        {#eventSource.onerror = function (error) {#}
+        {#    console.error('Error with SSE connection:', error);#}
 
-        eventSource.onerror = function (error) {
-            console.error('Error with SSE connection:', error);
-            // You could reconnect or show an error message to the user here
-        };
+        function showOrderDetail(orderId) {
+            {# clear previous selection #}
+
+
+            fetch(`/admin/order/detail/${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({orders_id: orderId})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const orderDetail = document.getElementById('order-detail');
+                    orderDetail.innerHTML = `
+                        <h1 class="text-2xl font-bold text-gray-600 mb-2">주문 상세</h1>
+                        <div class="flex flex-col gap-2">
+                            <ul class="flex flex-col gap-2 flex-1 overflow-y-scroll max-h-screen">
+                                <li class="px-4 py-3 bg-white rounded-md grid grid-cols-3">
+                                    <span class="font-bold text-gray-400">메뉴</span>
+                                    <span class="font-bold text-gray-400 place-self-end">수량</span>
+                                    <span class="font-bold text-gray-400 place-self-end">가격</span>
+                                </li>
+                                ${data.map(order => `
+                                    <li class="px-4 py-3 bg-white rounded-md grid grid-cols-3">
+                                        <span class="font-bold">${order.name}</span>
+                                        <span class="font-bold place-self-end">${order.quantity}</span>
+                                        <span class="font-bold place-self-end">${order.price}</span>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                            <div class="flex flex-col gap-1">
+                                <button class="w-full rounded-md bg-zinc-800 text-gray-200 p-2 hover:bg-zinc-700">주문 완료</button>
+                                <button class="w-full rounded-md bg-zinc-200 text-red-500 p-2 hover:bg-zinc-300">주문 취소</button>
+                            </div>
+                        </div>
+                    `;
+                });
+        }
     </script>
 {% endblock %}
