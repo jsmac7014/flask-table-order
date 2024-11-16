@@ -29,7 +29,14 @@
                             <br/>
                             {{ order.order_date }}
                         </span>
-                            <span class="font-bold {{ "text-yellow-500" if order.status == "PENDING" else "text-green-500" }}">
+                            {% if order.status == "PENDING" %}
+                                {% set status = "text-yellow-500" %}
+                            {% elif order.status == "CONFIRM" %}
+                                {% set status = "text-green-500" %}
+                            {% else %}
+                                {% set status = "text-red-500" %}
+                            {% endif %}
+                            <span class="font-bold {{ status }}">
                              {{ order.status }}
                         </span>
                         </label>
@@ -41,44 +48,51 @@
             </div>
         </div>
     </div>
-
     <script>
         window.onload = function () {
             const body = document.querySelector('body');
             body.classList.add('overflow-y-hidden');
         }
-        {#const eventSource = new EventSource('/order/stream/{{ session['stores_id'] }}');#}
-        {#eventSource.onmessage = function (event) {#}
-        {#    let data = JSON.parse(event.data);#}
-        {#    console.log(data);#}
-        {#    data = data[0];#}
-        {##}
-        {#    const orderList = document.getElementById('orderList');#}
-        {#    const orderItem = document.createElement('li');#}
-        {##}
-        {#    orderItem.classList.add('px-4', 'py-3', 'bg-white', 'rounded-md', 'flex', 'justify-between', 'cursor-pointer');#}
-        {#    orderItem.setAttribute('data-order-id', data.orders_id);#}
-        {##}
-        {#    const orderInfo = document.createElement('span');#}
-        {#    orderInfo.classList.add('font-bold');#}
-        {#    orderInfo.innerText = `${data.table_name}\n${data.order_date}`;#}
-        {#    orderItem.appendChild(orderInfo);#}
-        {##}
-        {#    const orderStatus = document.createElement('span');#}
-        {#    orderStatus.classList.add('font-bold', `${data.status === 'PENDING' ? 'text-yellow-500' : 'text-green-500'}`);#}
-        {#    orderStatus.innerText = data.status;#}
-        {#    orderItem.appendChild(orderStatus);#}
-        {##}
-        {##}
-        {#    orderList.prepend(orderItem);#}
-        {##}
-        {#eventSource.onerror = function (error) {#}
-        {#    console.error('Error with SSE connection:', error);#}
+
+        const socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('connect', function () {
+            console.log("Connected to server");
+            const storeId = {{ session['stores_id'] }};
+            socket.emit('join.admin', {store_id: storeId});
+        });
+
+        socket.on('created.order.admin', function (data) {
+            console.log("New order received for admin:", data);
+            const orderList = document.getElementById('orderList');
+            const order = data.data;
+            const li = document.createElement('li');
+
+            console.log(order);
+
+            li.innerHTML = `
+                <input type="radio" name="order" value="${order.orders_id}"
+                       class="peer hidden" id="orders-${order.orders_id}">
+                <label for="orders-${order.orders_id}"
+                       class="px-4 py-3 bg-white rounded-md flex justify-between cursor-pointer border peer-checked:bg-gray-200"
+                       data-order-id="${order.orders_id}"
+                       onclick="showOrderDetail(${order.orders_id})"
+                >
+                    <span class="font-bold">
+                        ${order.name}
+                        <br/>
+                        ${new Date(order.order_date).toLocaleString()}
+                    </span>
+                    <span class="font-bold ${order.status === 'PENDING' ? 'text-yellow-500' : 'text-green-500'}">
+                        ${order.status}
+                    </span>
+                </label>
+            `;
+
+            orderList.prepend(li);
+        });
 
         function showOrderDetail(orderId) {
-            {# clear previous selection #}
-
-
             fetch(`/admin/order/detail/${orderId}`, {
                 method: 'POST',
                 headers: {
@@ -107,11 +121,40 @@
                                 `).join('')}
                             </ul>
                             <div class="flex flex-col gap-1">
-                                <button class="w-full rounded-md bg-zinc-800 text-gray-200 p-2 hover:bg-zinc-700">주문 완료</button>
-                                <button class="w-full rounded-md bg-zinc-200 text-red-500 p-2 hover:bg-zinc-300">주문 취소</button>
+                                <button class="w-full rounded-md bg-zinc-800 text-gray-200 p-2 hover:bg-zinc-700" onclick="confirmOrder(${orderId})">주문 완료</button>
+                                <button class="w-full rounded-md bg-zinc-200 text-red-500 p-2 hover:bg-zinc-300" onclick="cancelOrder(${orderId})">주문 취소</button>
                             </div>
                         </div>
                     `;
+                });
+        }
+
+        function confirmOrder(orderId) {
+            fetch(`/admin/order/confirm/${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({orders_id: orderId})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    window.location.reload();
+                });
+
+        }
+
+        function cancelOrder(orderId) {
+            fetch(`/admin/order/cancel/${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({orders_id: orderId})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    window.location.reload();
                 });
         }
     </script>

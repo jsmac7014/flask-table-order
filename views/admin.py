@@ -1,9 +1,9 @@
-from flask import Blueprint, render_template, request, session, redirect, jsonify, Response, current_app
+from flask import Blueprint, render_template, request, session, redirect, jsonify
 from werkzeug.utils import secure_filename
 
 from db.auth import sign_in_admin_user, sign_up_admin_user, check_admin_user_with_stores_id
-from db.orders import get_last_orders_id, get_new_orders, get_orders_list, get_orders_detail
-from db.stores import create_store, get_stores_categories, get_stores_foods, create_store_foods, get_stores_foods_detail
+from db.orders import get_orders_list, get_orders_detail, update_order_status
+from db.stores import create_store, get_stores_foods, create_store_foods, get_stores_foods_detail
 from db.stores_tables import get_stores_tables, create_stores_tables, get_stores_tables_detail
 
 from s3_connect import upload_file
@@ -13,6 +13,7 @@ admin = Blueprint('admin', __name__)
 
 def is_logged_in():
     return session.get('logged_in')
+
 
 
 @admin.route('/table')
@@ -156,6 +157,29 @@ def order_detail(order_id):
     orders = get_orders_detail(orders_id, stores_id)
     return jsonify(orders)
 
+@admin.route('/order/confirm/<order_id>', methods=['POST'])
+def order_confirm(order_id):
+    if not is_logged_in():
+        return redirect('/admin/sign-in')
+
+    data = request.get_json()
+    orders_id = data['orders_id']
+
+    result = update_order_status({'orders_id': orders_id, 'status': 'CONFIRM'})
+
+    return jsonify({'status': 'success'})
+
+@admin.route('/order/cancel/<order_id>', methods=['POST'])
+def order_cancel(order_id):
+    if not is_logged_in():
+        return redirect('/admin/sign-in')
+
+    data = request.get_json()
+    orders_id = data['orders_id']
+
+    result = update_order_status({'orders_id': orders_id, 'status': 'CANCEL'})
+
+    return jsonify({'status': 'success'})
 
 @admin.route('/table/create', methods=['POST'])
 def table_create():

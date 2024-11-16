@@ -22,19 +22,19 @@ def order(stores_id):
 def order_confirm(stores_id):
     return render_template('guest/order-confirm.html', stores_id=stores_id)
 
-@guest.route('/order/create', methods=['POST'])
-def order_create():
-    data = request.get_json()
+# @guest.route('/order/create', methods=['POST'])
+# def order_create():
+#     data = request.get_json()
+#
+#     table_id = data['table_id']
+#     orders = data['order']
+#
+    # orders_id = create_order({'order_date': datetime.datetime.now(), 'status': 'PENDING', 'stores_tables_id': table_id})
+    # if(orders_id is None):
+    #     return jsonify({'result': 'fail'})
 
-    table_id = data['table_id']
-    orders = data['order']
-
-    orders_id = create_order({'order_date': datetime.datetime.now(), 'status': 'PENDING', 'stores_tables_id': table_id})
-    if(orders_id is None):
-        return jsonify({'result': 'fail'})
-
-    result = create_orders_has_foods(orders, orders_id)
-    if(result is False):
-        return jsonify({'result': 'fail'})
-
-    return jsonify({'result': 'success'})
+#     result = create_orders_has_foods(orders, orders_id)
+#     if(result is False):
+#         return jsonify({'result': 'fail'})
+#
+#     return jsonify({'result': 'success'})

@@ -36,9 +36,10 @@
         {#        </div>#}
     </div>
     <script>
+        const socket = io.connect('http://' + document.domain + ':' + location.port);
+
         window.onload = function () {
             const orders = localStorage.getItem('order');
-            console.log(orders);
             if (orders) {
                 const order = JSON.parse(orders);
                 const orderItems = document.getElementById('order-items');
@@ -69,27 +70,25 @@
             if (orders) {
                 const order = JSON.parse(orders);
                 const data = {
+                    stores_id: window.location.pathname.split('/')[3],
                     table_id: table_id,
                     order: order
                 }
 
-                fetch('/guest/order/create', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                }).then(res => res.json())
-                    .then(data => {
-                        console.log(data);
-                        if (data.result === 'success') {
-                            alert('주문이 완료되었습니다');
-                            localStorage.removeItem('order');
-                            window.location.href = '/guest/order/{{ stores_id }}';
-                        }
-                    })
+                console.log(data);
+
+                socket.emit('create.order', data);
             }
         }
+
+        socket.on('created.order', function (data) {
+            console.log("connect created.order", data);
+            if (data.result === 'success') {
+                alert('주문이 완료되었습니다');
+                localStorage.removeItem('order');
+                window.location.href = '/guest/order/{{ stores_id }}';
+            }
+        });
     </script>
 {% endblock %}
 

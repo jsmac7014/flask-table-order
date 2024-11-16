@@ -75,3 +75,26 @@ def get_stores_tables_detail(table_id):
         return None
     finally:
         conn.close()
+
+    return None
+
+def get_stores_tables_name(table_id):
+    conn = db_connect()
+
+    if conn is None:
+        return None
+
+    try:
+        cursor = conn.cursor()
+        sql = 'SELECT name FROM stores_tables WHERE id = %s'
+        cursor.execute(sql, (table_id))
+        result = cursor.fetchone()
+
+        return result[0]
+    except Exception as e:
+        print('에러 발생', e)
+        return None
+    finally:
+        conn.close()
+
+    return None
