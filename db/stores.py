@@ -44,7 +44,7 @@ def get_stores_foods(store_id):
         return None
     try:
         cursor = conn.cursor()
-        sql = 'SELECT id, name, category, description, image_url, price FROM stores_foods WHERE stores_id = %s'
+        sql = 'SELECT id, name, category, description, image_url, price FROM stores_foods WHERE stores_id = %s AND is_active = 1'
         cursor.execute(sql, (store_id))
         result = cursor.fetchall()
         field = ['id', 'name', 'category', 'description', 'image_url', 'price']
@@ -87,6 +87,45 @@ def create_store_foods(data):
         conn.commit()
         print('메뉴 생성 완료')
         return True
+    except Exception as e:
+        print('에러 발생', e)
+        return None
+    finally:
+        conn.close()
+
+def soft_delete_stores_foods(data):
+    conn = db_connect()
+    if conn is None:
+        return None
+    try:
+        cursor = conn.cursor()
+        sql = 'UPDATE stores_foods SET is_active = 0 WHERE id = %s'
+        cursor.execute(sql, (data['id']))
+        conn.commit()
+        print('메뉴 삭제 완료')
+        return True
+    except Exception as e:
+        print('에러 발생', e)
+        return None
+    finally:
+        conn.close()
+
+def get_stores_foods_sales(stores_id):
+    conn = db_connect()
+    if conn is None:
+        return None
+    try:
+        cursor = conn.cursor()
+        sql = """
+            SELECT f.name, SUM(ohf.quantity) as quantity, SUM(ohf.quantity * f.price) as sales
+            FROM orders_has_foods ohf, stores_foods f, orders o
+            WHERE ohf.stores_foods_id = f.id AND ohf.orders_id = o.id AND f.stores_id = %s AND o.status = 'CONFIRM'
+            GROUP BY f.name
+        """
+        cursor.execute(sql, (stores_id))
+        result = cursor.fetchall()
+
+        return result
     except Exception as e:
         print('에러 발생', e)
         return None

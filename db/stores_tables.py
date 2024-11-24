@@ -78,6 +78,29 @@ def get_stores_tables_detail(table_id):
 
     return None
 
+def get_stores_tables_orders(table_id):
+    conn = db_connect()
+
+    if conn is None:
+        return None
+
+    try:
+        cursor = conn.cursor()
+        sql = 'SELECT id, order_date, status FROM orders WHERE stores_tables_id = %s'
+        cursor.execute(sql, (table_id))
+        result = cursor.fetchall()
+
+        field = ['id', 'order_date', 'status']
+        orders = [dict(zip(field, r)) for r in result]
+
+        return orders
+    except Exception as e:
+        print('에러 발생', e)
+        return None
+    finally:
+        conn.close()
+
+
 def get_stores_tables_name(table_id):
     conn = db_connect()
 

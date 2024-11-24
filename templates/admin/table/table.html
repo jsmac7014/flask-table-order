@@ -31,10 +31,10 @@
             <ul class="grid grid-cols-1 gap-2 md:grid-cols-5">
                 {% for table in tables %}
                     <li class="rounded-md bg-white p-4 transition-colors hover:bg-gray-200 text-center">
-                        <a href="{{ url_for('admin.table_detail', table_id = table.id) }}">
+{#                        <a href="{{ url_for('admin.table_detail', table_id = table.id) }}">#}
                             <h1 class="text-lg font-bold">{{ table.name }}</h1>
                             <p class="text-gray-500">{{ table.min_seat }} ~ {{ table.max_seat }}명</p>
-                        </a>
+{#                        </a>#}
                     </li>
                 {% endfor %}
             </ul>
